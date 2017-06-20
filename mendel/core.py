@@ -277,14 +277,9 @@ class Mendel(object):
     def _get_current_release(self):
         with cd(self._rpath()):
             y = sudo('readlink current', user=self._user, group=self._group)
-            current_release = y.split('/')[-1].strip()
-        return current_release
-
-    def _get_current_release_python(self):
-        with cd(self._rpath()):
-            y = sudo('readlink current', user=self._user, group=self._group)
             # Python projects link to their package directory, so go back one more
-            current_release = y.split('/')[-2].strip()
+            position = -2 if self._project_type == 'python' else -1
+            current_release = y.split('/')[position].strip()
         return current_release
 
     def _get_all_releases(self):
@@ -506,14 +501,9 @@ class Mendel(object):
                 print red('Only 1 release available, nothing to rollback to :(')
                 sys.exit(1)
 
-            if self._project_type == 'python':
-                current_release = self._get_current_release_python()
-            else:
-                current_release = self._get_current_release()
-
             curr_index = self._display_releases_for_rollback_selection(
                 all_releases,
-                current_release
+                self._get_current_release()
             )
 
             default_rollback_choice = all_releases[max(curr_index - 1, 0)]
