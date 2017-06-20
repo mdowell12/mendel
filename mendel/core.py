@@ -402,8 +402,7 @@ class Mendel(object):
                         user=self._user,
                         group=self._group)
                 # need to get the top level application directory but not the egg-info directory or other setup files
-                project_dir = sudo("find . -maxdepth 1 -mindepth 1 -type d -not -regex '.*egg-info$'")
-                project_dir = project_dir[2:]  # find command returns a string like './dir'
+                project_dir = self._python_project_dir(release_dir)
                 self._change_symlink_to(self._rpath('releases', release_dir, project_dir))
 
     def _install_jar(self, jar_name):
@@ -512,7 +511,12 @@ class Mendel(object):
                                  default=default_rollback_choice,
                                  validate=is_valid)
             with cd(self._rpath('releases', rollback_to)):
-                self._change_symlink_to(self._rpath('releases', rollback_to))
+                if self._project_type == 'python':
+                    project_dir = self._python_project_dir(rollback_to)
+                    self._change_symlink_to(self._rpath('releases', rollback_to, project_dir))
+                else:
+                    self._change_symlink_to(self._rpath('releases', rollback_to))
+
                 self._start_or_restart()
                 print green('successfully rolled back %s to %s' % (
                     self._service_name, rollback_to))
@@ -599,6 +603,11 @@ class Mendel(object):
             )
             self._apt_install_remote_deb(version=rollback_to)
         self._track_event('rolledback')
+
+    def _python_project_dir(release_dir):
+        with cd(self._rpath('releases', release_dir)):
+            project_dir = sudo("find . -maxdepth 1 -mindepth 1 -type d -not -regex '.*egg-info$'")
+        return project_dir[2:]  # find command returns a string like './dir'
 
     ############################################################################
     # Deploy Tasks
