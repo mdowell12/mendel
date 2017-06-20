@@ -1,3 +1,4 @@
+ads-dfw-01,prodd-fb-ig-ads-dfw-02
 from datetime import datetime
 from functools import partial
 import getpass
@@ -399,10 +400,7 @@ class Mendel(object):
                         .format(srv_name=self._service_name, rel_dir=self._rpath('releases', release_dir)),
                         user=self._user,
                         group=self._group)
-                # need to get the top level application directory but not the egg-info directory or other setup files
-                project_dir = sudo("find . -maxdepth 1 -mindepth 1 -type d -not -regex '.*egg-info$'")
-                project_dir = project_dir[2:]  # find command returns a string like './dir'
-                self._change_symlink_to(self._rpath('releases', release_dir, project_dir))
+                self._change_symlink_to(self._rpath('releases', release_dir))
 
     def _install_jar(self, jar_name):
         release_dir = self._new_release_dir()
