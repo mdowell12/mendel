@@ -1,0 +1,8 @@
+service_name: myservice
+bundle_type: tgz
+project_type: python
+build_target_path: dist
+hosts:
+  dev:
+    hostnames: 127.0.0.1
+    port: 2222
