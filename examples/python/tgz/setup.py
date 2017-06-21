@@ -6,7 +6,7 @@ setup(
     packages=['hello'],
     include_package_data=True,
     license=None,
+    url="fake url",
     description="A basic python app.",
-    author="Sprout Social",
     classifiers=[],
 )
