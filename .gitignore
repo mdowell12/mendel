@@ -5,3 +5,4 @@ build/
 *.pyc
 .vagrant/
 *.egg
+target/

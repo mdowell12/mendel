@@ -1,20 +1,33 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+SERVICE_NAME = "myservice"
+
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu/trusty64"
 
   config.vm.network "forwarded_port", guest: 8080, host: 8080
 
+  # config.ssh.keys_only = false
+  config.ssh.private_key_path = ["/Users/mattdowell/github/mendel/examples/python/tgz/.vagrant/machines/default/virtualbox/private_key", "/Users/mattdowell/.ssh/id_rsa"]
+
   config.vm.provision "shell", inline: <<-SHELL
     sudo apt-get update
 
-    sudo adduser --home /srv/myservice --system --disabled-password --group myservice
-    sudo cp /vagrant/upstart/myservice.conf /etc/init/myservice.conf
-    sudo mkdir /srv/myservice/releases
-    sudo mkdir /srv/myservice/releases/init
-    sudo ln -sfT /srv/myservice/releases/init /srv/myservice/current
-    sudo chown -R myservice:myservice /srv/myservice
-    # install python?
+    sudo adduser --home /srv/#{SERVICE_NAME} --system --disabled-password --group #{SERVICE_NAME}
+    sudo cp /vagrant/upstart/#{SERVICE_NAME}.conf /etc/init/#{SERVICE_NAME}.conf
+    sudo mkdir /var/run/#{SERVICE_NAME}
+    sudo mkdir /var/log/#{SERVICE_NAME}
+    sudo mkdir /srv/#{SERVICE_NAME}/releases
+    sudo mkdir /srv/#{SERVICE_NAME}/releases/init
+    sudo ln -sfT /srv/#{SERVICE_NAME}/releases/init /srv/#{SERVICE_NAME}/current
+    sudo chown -R #{SERVICE_NAME}:#{SERVICE_NAME} /srv/#{SERVICE_NAME}
+
+    sudo apt-get -y install python-setuptools python-dev build-essential
+    sudo easy_install pip
+    sudo pip install --upgrade virtualenv
+
+    cd /srv/#{SERVICE_NAME} && virtualenv env
+
   SHELL
 end
