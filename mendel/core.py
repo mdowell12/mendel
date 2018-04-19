@@ -726,7 +726,7 @@ class Mendel(object):
 
         data = {'what': what, 'tags': tags, 'data': data}
         try:
-            r = urllib2.urlopen(url, json.dumps(data))
+            r = urllib2.urlopen(url, json.dumps(data), timeout=3)
         except Exception as e:
             print red('Error while tracking deployment event in graphite: %s' % str(e))
             return
